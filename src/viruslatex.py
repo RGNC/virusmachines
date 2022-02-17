@@ -70,13 +70,14 @@ def viruslatex(vm, vertical_hosts = 2, horizontal_hosts = 2, filename = '', verb
     if filename:
         number = 0
         fn = filesdir + filesname
-        if filename.endswith('.tex'):
-            fn = fn[:-4]
+        if not fn.endswith('.tex'):
+            fn += '.tex'
         if os.path.isfile(fn):
-            fn += '-0'
+            fn = fn[:-4] + '-0.tex'
         while os.path.isfile(fn):
             number += 1
-            fn = re.match('(.*)-(.*?)', fn).group(1) + '-' + str(number)
+            fn = fn[:-4]
+            fn = re.match('(.*)-(.*?)', fn).group(1) + '-' + str(number) + '.tex'
         f = open(fn + '.tex', 'w')
         f.write(beg_code)
         f.write(mid_code)
