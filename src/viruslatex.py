@@ -1,3 +1,5 @@
+import os.path
+import re
 filesdir = 'genlatex/'
 
 def viruslatex(vm, vertical_hosts = 2, horizontal_hosts = 2, filename = '', verbose=False):
@@ -66,10 +68,16 @@ def viruslatex(vm, vertical_hosts = 2, horizontal_hosts = 2, filename = '', verb
     end_code = r'''\end{document}'''
 
     if filename:
+        number = 0
+        fn = filesdir + filesname
         if filename.endswith('.tex'):
-            f = open(filesdir + filename, 'w')
-        else:
-            f = open(filesdir + filename + '.tex', 'w')
+            fn = fn[:-4]
+        if os.path.isfile(fn):
+            fn += '-0'
+        while os.path.isfile(fn):
+            number += 1
+            fn = re.match('(.*)-(.*?)', fn).group(1) + '-' + str(number)
+        f = open(fn + '.tex', 'w')
         f.write(beg_code)
         f.write(mid_code)
         f.write(end_code)
