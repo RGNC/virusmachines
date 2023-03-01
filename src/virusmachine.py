@@ -7,7 +7,10 @@ class VirusMachine(object):
         self.instructions = instructions
         self.instruction_connections = instruction_connections
         self.current_step = 0
-        self.current_instruction = self.instructions[0]
+        if len(instructions):
+            self.current_instruction = self.instructions[0]
+        else:
+            self.current_instruction = None
 
     def restart(self):
         for h in self.hosts:
@@ -53,15 +56,17 @@ class VirusMachine(object):
         config = []
         for h in self.hosts:
             config.append(h.viruses)
+        # config.append(self.instructions.index(self.current_instruction) + 1 if self.current_instruction else "#")
         config.insert(-1, self.instructions.index(self.current_instruction) + 1 if self.current_instruction else "#")
         return config
+
+    def set_host_viruses(self, host, viruses):
+        self.hosts[host].viruses = viruses
 
     def get_printable_configuration(self):
         strout = 'C_{' + str(self.current_step) + '} = '
         config = self.get_configuration()
-        if config[-2] == '#':
-            config[-2] = '#'
-        else:
+        if not (config[-2] == '#'):
             config[-2] = 'i_{' + str(config[-2]) + '}'
         strout += str(config)
         return strout
@@ -96,14 +101,15 @@ class VirusMachine(object):
         n_insts = len(self.instructions)
         horizontal_insts = max(1, math.floor(n_insts / vertical_insts))
         max_horizontal = max(horizontal_hosts * 4, horizontal_insts * 2)
-        for h in range(n_hosts-1):
+        for h in range(1,n_hosts):
             viruses = '' if not self.hosts[h].viruses else str(self.hosts[h].viruses)
-            hosts_code += '  \host{' + str(h+1) + '}{' + str(4*(h%horizontal_hosts)) + '}{' + str(2*math.floor(h/horizontal_hosts)) + '}{$' + viruses + '$}%\n'
+            hosts_code += '  \host{' + str(h) + '}{' + str(4*(h%horizontal_hosts)) + '}{' + str(2*math.floor(h/horizontal_hosts)) + '}{$' + viruses + '$}%\n'
         hosts_code += '  \env{' + str(2*horizontal_hosts) + '}{4}%\n'
         hosts_conns = set()
         for i in range(n_insts):
             insts_code += '  \instruction{' + str(i+1) + '}{' + str(2*(i%horizontal_insts)) + '}{' + str(-4-(2*math.floor(i/horizontal_insts))) + '}%\n'
             if self.instructions[i].origin_host:
+                # Here, the code needs the environment to be at the position -1 in the hosts list
                 origin = 'env' if self.hosts.index(self.instructions[i].origin_host) == (n_hosts-1) else str(self.hosts.index(self.instructions[i].origin_host)+1)
                 objective = 'env' if self.hosts.index(self.instructions[i].objective_host) == (n_hosts-1) else str(self.hosts.index(self.instructions[i].objective_host)+1)
                 multiplier = '' if self.instructions[i].multiplier == 1 else str(self.instructions[i].multiplier)

@@ -16,7 +16,7 @@ def ensure_properties(virusmachine, configuration):
         exit(-1)
 
 def satinize_configuration(configuration):
-    if isinstance(configuration[-2], str) and (not configuration[-2] == "#"):
+    if isinstance(configuration[-2], str) and (not configuration[-2] == "#") and (not configuration[-2] == "*"):
         configuration[-2] = int(configuration[-2][1:])
     return configuration
 
@@ -35,11 +35,20 @@ def properties_to_satisfy(configuration, expression, variables, bucles):
     bucles = satinize_bucles(bucles)
     for element in variable_sets:
         new_variable_sets = []
-        for bucle in bucles:
-            for index in bucles[bucle]:
+        if bucles:
+            for i in bucles:
+                length = len(bucles[i])
+                break
+            for index in range(length):
                 new_element = element.copy()
-                new_element[bucle] = index
+                for bucle in bucles:
+                    new_element[bucle] = bucles[bucle][index]
                 new_variable_sets.append(new_element)
+        # for bucle in bucles:
+        #     for index in bucles[bucle]:
+        #         new_element = element.copy()
+        #         new_element[bucle] = index
+        #         new_variable_sets.append(new_element)
         if new_variable_sets:
             variable_sets = new_variable_sets
     properties = {}

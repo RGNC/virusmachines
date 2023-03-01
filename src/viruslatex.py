@@ -19,6 +19,11 @@ def viruslatex(vm, vertical_hosts = 2, horizontal_hosts = 2, filename = '', verb
     name=#1,
     label={south east:#2}
   },
+  inithost/.style = {
+    double,
+    double distance=1pt,
+    outer sep=0.5pt
+  },
   instruction/.style n args = {2}{
     draw=cyan,fill=cyan,circle,
     minimum width=1cm,
@@ -45,6 +50,7 @@ def viruslatex(vm, vertical_hosts = 2, horizontal_hosts = 2, filename = '', verb
 }
 
 \newcommand{\host}[4]{\node[host={h#1}{$h_{#1}$}] at (#2,#3) {#4};}
+\newcommand{\inithost}[4]{\node[host={h#1}{$h_{#1}$},inithost] at (#2,#3) {#4};}
 \newcommand{\instruction}[3]{\node[instruction={i#1}{$i_{#1}$}] at (#2,#3)
   {};}
 \newcommand{\env}[2]{\node[env] (henv) at (#1,#2) {};}
@@ -69,7 +75,7 @@ def viruslatex(vm, vertical_hosts = 2, horizontal_hosts = 2, filename = '', verb
 
     if filename:
         number = 0
-        fn = filesdir + filesname
+        fn = filesdir + filename
         if not fn.endswith('.tex'):
             fn += '.tex'
         if os.path.isfile(fn):
@@ -78,7 +84,7 @@ def viruslatex(vm, vertical_hosts = 2, horizontal_hosts = 2, filename = '', verb
             number += 1
             fn = fn[:-4]
             fn = re.match('(.*)-(.*?)', fn).group(1) + '-' + str(number) + '.tex'
-        f = open(fn + '.tex', 'w')
+        f = open(fn, 'w')
         f.write(beg_code)
         f.write(mid_code)
         f.write(end_code)
