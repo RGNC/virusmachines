@@ -1,11 +1,13 @@
 import math
+import random
 
 class VirusMachine(object):
 
-    def __init__(self, hosts, instructions, instruction_connections):
+    def __init__(self, hosts, instructions, instruction_connections, non_determinism = False):
         self.hosts = hosts
         self.instructions = instructions
         self.instruction_connections = instruction_connections
+        self.non_determinism = non_determinism
         self.current_step = 0
         if len(instructions):
             self.current_instruction = self.instructions[0]
@@ -28,13 +30,21 @@ class VirusMachine(object):
                 origin_host.viruses -= 1
                 objective_host.viruses += 1 * multiplier
                 if len(next_instructions):
-                    self.current_instruction = next_instructions[0][0]
+                    if self.non_determinism and (next_instructions[0][1] == next_instructions[1][1]):
+                        index = random.randint(0, len(next_instructions) - 1)
+                        self.current_instruction = next_instructions[index][0]
+                    else:
+                        self.current_instruction = next_instructions[0][0]
                 else:
                     self.current_instruction = None
                 self.current_step += 1
             else:
                 if len(next_instructions):
-                    self.current_instruction = next_instructions[-1][0]
+                    if self.non_determinism and (next_instructions[0][1] == next_instructions[1][1]):
+                        index = random.randint(0, len(next_instructions) - 1)
+                        self.current_instruction = next_instructions[index][0]
+                    else:
+                        self.current_instruction = next_instructions[-1][0]
                 else:
                     self.current_instruction = None
                 self.current_step += 1
