@@ -81,7 +81,7 @@ class VirusMachine(object):
         strout += str(config)
         return strout
 
-    def compute(self, verbose = 0, steps = 10000000000000000000000):
+    def compute(self, verbose = 0, steps = float('inf')):
         init_step = self.current_step
         if verbose == 1:
             print(self.get_configuration())
