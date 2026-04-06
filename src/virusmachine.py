@@ -3,14 +3,17 @@ import random
 
 class VirusMachine(object):
 
-    def __init__(self, hosts, instructions, instruction_connections, non_determinism = False):
+    def __init__(self, hosts, instructions, instruction_connections, non_determinism = False, initial_instruction=None):
         self.hosts = hosts
         self.instructions = instructions
         self.instruction_connections = instruction_connections
         self.non_determinism = non_determinism
         self.current_step = 0
         if len(instructions):
-            self.current_instruction = self.instructions[0]
+            if initial_instruction:
+                self.current_instruction = self.instructions[self.instructions.index(initial_instruction)]
+            else:
+                self.current_instruction = self.instructions[0]
         else:
             self.current_instruction = None
 
@@ -67,7 +70,10 @@ class VirusMachine(object):
         for h in self.hosts:
             config.append(h.viruses)
         # config.append(self.instructions.index(self.current_instruction) + 1 if self.current_instruction else "#")
-        config.insert(-1, self.instructions.index(self.current_instruction) + 1 if self.current_instruction else "#")
+        if self.current_instruction.name:
+            config.insert(-1, self.instructions.index(self.current_instruction) if self.current_instruction else "#")
+        else:
+            config.insert(-1, self.instructions.index(self.current_instruction) + 1 if self.current_instruction else "#")
         return config
 
     def set_host_viruses(self, host, viruses):
@@ -77,7 +83,10 @@ class VirusMachine(object):
         strout = 'C_{' + str(self.current_step) + '} = '
         config = self.get_configuration()
         if not (config[-2] == '#'):
-            config[-2] = 'i_{' + str(config[-2]) + '}'
+            if self.instructions[config[-2]].name:
+                config[-2] = self.instructions[config[-2]].name
+            else:
+                config[-2] = 'i_{' + str(config[-2]) + '}'
         strout += str(config)
         return strout
 
